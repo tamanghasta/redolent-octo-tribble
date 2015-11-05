@@ -1,0 +1,109 @@
+﻿@model IEnumerable<responsive_tutorials.Models.NewsModel>
+
+@{
+    ViewBag.Title = "News";
+}
+
+<h2>News</h2>
+<div class="row">
+    <div class="large-10 column">
+        <div class="panel">
+            <div class="news-panel">
+                <h2 class="panel-heading">Title</h2>
+                <p class="panel-body">Summary</p>
+            </div>
+            <div class="panel-footer">
+                <a href="#" class="prevBtn button small">Previous</a>
+                <a href="#" class="nextBtn button small">Next</a>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(function () {
+            var newsArray = @Html.Raw(Json.Encode(Model));
+            var newsPanel = $(".news-panel");
+            var prev = $(".prevBtn");
+            var next = $(".nextBtn");
+            var newsArrayLength = newsArray.length;
+
+            console.log("news array: ",newsArray);
+            console.log("news array length",newsArrayLength);
+
+            // take the first item from an array and set that as current
+            var currentNews = newsArray[0]; 
+            renderNews(currentNews);
+
+
+            function renderNews(News){
+                var title =  "<h2 class='panel-heading'>" + News.Title + "</h2>";
+                var summary = "<p class='panel-body'>" + News.Summary + "</p>";
+                newsPanel.empty();
+                newsPanel.html(title + summary);
+
+                // set this news as current
+                currentNews = News; 
+            }
+
+            prev.on("click", getPreviousNews);
+            next.on("click", getNextNews);
+
+            function getPreviousNews(e){
+                e.preventDefault();
+                var prevNewsIndex = newsArray.indexOf(currentNews) - 1;
+                var prevNews
+                console.log("previous news index: ", prevNewsIndex);
+
+                var indexIsNeg = checkIfIndexIsNegative(prevNewsIndex);
+               
+                if (!indexIsNeg) {
+                    prevNews = newsArray[prevNewsIndex];
+                } else {
+                    prevNews = newsArray[newsArrayLength - 1];
+                }
+
+                renderNews(prevNews);
+               
+               
+            }
+
+            function getNextNews(e){
+                e.preventDefault();
+                var nextNewsIndex = newsArray.indexOf(currentNews) + 1;
+                var nextNews;
+
+                console.log("next news index: ", nextNewsIndex);
+                var indexIsLast = checkIfLastIndex(nextNewsIndex);
+                if(!indexIsLast){
+                    nextNews = newsArray[nextNewsIndex];
+                } else{
+                    nextNews = newsArray[0];
+                }
+
+                renderNews(nextNews);
+             
+               
+            }
+
+            function checkIfIndexIsNegative(index){
+                if (index === -1){
+                    return true;
+                }else{
+                    return false;
+                }
+
+            }
+
+            function checkIfLastIndex(index){
+                if( index === newsArrayLength){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+
+        });
+    </script>
+}
+
